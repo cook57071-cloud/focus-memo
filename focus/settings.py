@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+'memo.apps.MemoConfig',   # 또는 그냥 'memo' 도 가능하지만 권장 방식
 ]
 
 MIDDLEWARE = [
