@@ -4,11 +4,20 @@ from .models import Memo
 class MemoForm(forms.ModelForm):
     class Meta:
         model = Memo
-        fields = ['content']  # 지금은 category 없으니까 content만!
+        # 사용자가 입력할 필드만 지정 (작성자, 날짜, 키워드는 자동 처리)
+        fields = ['content']  # 카테고리 없이 content만
+        
+        # 화면에 보여질 이름(레이블) 설정
+        labels = {
+            'content': '메모 내용',
+        }
+        
+        # HTML 태그에 디자인(CSS 클래스)이나 속성을 추가
         widgets = {
             'content': forms.Textarea(attrs={
-                'rows': 8,
-                'placeholder': '자유롭게 메모를 작성하세요...',
                 'class': 'form-control',
+                'placeholder': '오늘의 생각이나 기록하고 싶은 내용을 자유롭게 작성해주세요...',
+                'rows': 10,
+                'style': 'resize: vertical;'
             }),
         }

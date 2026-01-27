@@ -1,23 +1,20 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
 from .forms import MemoForm
 from .models import Memo
 from django.contrib import messages
 
+@login_required  # 로그인한 사용자만 접근 가능
 def memo_create(request):
     if request.method == 'POST':
         form = MemoForm(request.POST)
         if form.is_valid():
             memo = form.save(commit=False)
-            # 아직 로그인 기능이 없으므로 임시로 첫 번째 사용자 지정
-            # (나중에 민승민님 로그인 구현 후 수정 예정)
-            if request.user.is_authenticated:
-                memo.author = request.user
-            else:
-                # 테스트용: 실제로는 로그인 필수로 바꿀 예정
-                memo.author = None  # 또는 임시 사용자
+            # 현재 로그인한 유저를 작성자로 지정
+            memo.author = request.user
             memo.save()
             messages.success(request, '메모가 저장되었습니다!')
-            return redirect('memo_list')  # 나중에 목록 페이지로
+            return redirect('/admin/')  # 임시로 관리자 페이지로
         else:
             messages.error(request, '입력 내용을 확인해 주세요.')
     else:
