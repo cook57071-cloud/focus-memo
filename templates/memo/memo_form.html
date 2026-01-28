@@ -8,7 +8,14 @@
 </head>
 <body>
     <div class="container mt-5">
-        <h2 class="mb-4">메모 작성</h2>
+        <h2 class="mb-4">
+            {% if form.instance.pk %}
+                메모 수정
+            {% else %}
+                메모 작성
+            {% endif %}
+        </h2>
+
         <form method="POST">
             {% csrf_token %}
             {{ form.as_p }}
