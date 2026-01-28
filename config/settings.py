@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'memo_app', # 동제 님의 앱 이름
+
+    'memo',   # ✅ 이 줄이 반드시 있어야 함
 ]
 
 MIDDLEWARE = [
@@ -55,10 +56,11 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
+        'DIRS': [BASE_DIR / 'templates'],  # ✅ 이 줄 있어야 함
+        'APP_DIRS': True,                   # ✅ 이게 핵심
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -66,6 +68,7 @@ TEMPLATES = [
         },
     },
 ]
+
 
 WSGI_APPLICATION = 'config.wsgi.application'
 

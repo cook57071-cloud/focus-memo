@@ -1,8 +1,11 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from .forms import MemoForm
 from .models import Memo
-from django.contrib import messages
+from django.views.decorators.http import require_POST
+
+
 
 @login_required  # 로그인한 사용자만 접근 가능
 def memo_create(request):
@@ -21,3 +24,24 @@ def memo_create(request):
         form = MemoForm()
 
     return render(request, 'memo/memo_form.html', {'form': form})
+
+from django.views.decorators.http import require_POST
+
+@require_POST
+@login_required
+def memo_delete(request, memo_id):
+    memo = get_object_or_404(Memo, id=memo_id, author=request.user)
+    memo.delete()
+    messages.success(request, "메모가 삭제되었습니다.")
+    return redirect('memo_list')
+
+@login_required
+def memo_list(request):
+    memos = Memo.objects.filter(author=request.user).order_by('-created_at')
+    return render(request, 'memo/memo_list.html', {'memos': memos})
+
+
+@login_required
+def memo_detail(request, memo_id):
+    memo = get_object_or_404(Memo, id=memo_id, author=request.user)
+    return render(request, 'memo/memo_detail.html', {'memo': memo})
