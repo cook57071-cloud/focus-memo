@@ -4,8 +4,68 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>MoodMemo | 목록</title>
+
+  <style>
+    body { background:#f7f5f1; }
+
+    .memo-card{
+      background:#fff;
+      border:1px solid #ece6de;
+      border-radius:18px;
+      padding:16px 18px;
+      box-shadow:0 6px 20px rgba(0,0,0,.04);
+      margin-bottom:12px;
+    }
+
+    .memo-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .memo-top .left{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:#f1f6ef;
+      color:#4d5a43;
+      font-weight:700;
+      font-size:12px;
+      border:1px solid #d9e4d6;
+    }
+
+    .date{
+      color:#6f6f6f;
+      font-size:13px;
+    }
+
+    .preview{
+      margin-top:10px;
+      color:#3e3e3e;
+      line-height:1.5;
+      white-space:pre-wrap;
+    }
+
+    .detail-link{
+      text-decoration:none;
+      font-weight:800;
+      color:#7a7a7a;
+      font-size:18px;
+    }
+    .detail-link:hover{ color:#333; }
+  </style>
 </head>
-<body style="background:#f7f5f1;">
+<body>
   <div style="max-width:980px;margin:0 auto;padding:24px;">
 
     <h1 style="margin:0 0 18px;">MoodMemo</h1>
@@ -26,42 +86,80 @@
     </div>
 
     <!-- 검색 -->
-    <form method="get" action="/memo/" style="display:flex;gap:10px;align-items:center;">
-      <input name="q" value="{{ q }}" placeholder="메모 검색...(내용)"
-             style="flex:1;padding:14px;border-radius:12px;border:1px solid #ddd;">
-      <button type="submit"
-              style="padding:12px 16px;border-radius:12px;border:none;background:#8fa18f;color:white;">
-        검색
-      </button>
-    </form>
+      <form method="get" action="{% url 'memo:list' %}" style="display:flex;gap:10px;align-items:center;">
+  <input name="q" value="{{ q }}" placeholder="메모 검색...(내용)"
+         style="flex:1;padding:14px;border-radius:12px;border:1px solid #ddd;">
+
+  {% if selected_category %}
+    <input type="hidden" name="category" value="{{ selected_category }}">
+  {% endif %}
+
+  <select name="sort"
+          onchange="this.form.submit()"
+          style="padding:12px 14px;border-radius:12px;border:1px solid #ddd;">
+    <option value="latest" {% if sort == "latest" %}selected{% endif %}>최신순</option>
+    <option value="oldest" {% if sort == "oldest" %}selected{% endif %}>오래된순</option>
+  </select>
+
+  <button type="submit"
+          style="padding:12px 16px;border-radius:12px;border:none;background:#8fa18f;color:white;">
+    검색
+  </button>
+</form>
+<div style="margin:12px 0 18px; display:flex; gap:10px; flex-wrap:wrap;">
+  <!-- 전체 -->
+  <a href="{% url 'memo:list' %}?q={{ q }}&sort={{ sort }}"
+     style="padding:8px 14px;border-radius:999px;border:1px solid #ddd;text-decoration:none;font-weight:700;
+            {% if not selected_category %}background:#8fa18f;color:#fff;border-color:#8fa18f;{% else %}color:#555;background:#fff;{% endif %}">
+    전체
+  </a>
+
+  {% for c in categories %}
+    <a href="{% url 'memo:list' %}?category={{ c.id }}&q={{ q }}&sort={{ sort }}"
+       style="padding:8px 14px;border-radius:999px;border:1px solid #ddd;text-decoration:none;font-weight:700;
+              {% if selected_category == c.id|stringformat:'s' %}background:#8fa18f;color:#fff;border-color:#8fa18f;{% else %}color:#555;background:#fff;{% endif %}">
+      {{ c.icon }} {{ c.name }}
+    </a>
+  {% endfor %}
+</div>
+
 
     <!-- 새 메모 작성 버튼 -->
     <div style="margin:18px 0;">
-      <a href="/memo/create/"
+      <a href="{% url 'memo:create' %}"
          style="display:block;text-align:center;padding:14px;border-radius:12px;background:#8fa18f;color:#fff;text-decoration:none;font-weight:600;">
         + 새 메모 작성
       </a>
     </div>
 
     <!-- 리스트 -->
-    {% for memo in memos %}
-      <div style="background:#fff;border:1px solid #eee;border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,.04);">
-        <div style="color:#666;font-size:13px;margin-bottom:8px;">
-          📅 {{ memo.created_at|date:"Y-m-d" }}
-        </div>
+ <!-- 리스트 -->
+{% for memo in memos %}
+  <div class="memo-card">
+    <div class="memo-top">
+      <div class="left">
+        {% if memo.category %}
+          <span class="badge">{{ memo.category.icon }} {{ memo.category.name }}</span>
+        {% endif %}
+        <span class="date">📅 {{ memo.created_at|date:"Y-m-d" }}</span>
+      </div>
 
-        <div style="font-size:16px;font-weight:600;margin-bottom:10px;white-space:pre-wrap;">
-          {{ memo.content|truncatechars:120 }}
-        </div>
+      <a class="detail-link" href="{% url 'memo:detail' memo.id %}">→</a>
+    </div>
 
-        <a href="{% url 'memo_detail' memo.id %}"
-           style="text-decoration:none;color:#555;font-weight:600;">
-          상세 →
+    <div class="preview">
+      {{ memo.content|truncatechars:90 }}
+    </div>
+  </div>
+
+{% empty %}
+  <div class="memo-card">아직 메모가 없어요. + 새 메모 작성해보자!</div>
+{% endfor %}
+
+
         </a>
       </div>
-    {% empty %}
-      <p style="margin-top:18px;">아직 메모가 없습니다.</p>
-    {% endfor %}
+   
 
   </div>
 </body>

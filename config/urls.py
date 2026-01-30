@@ -11,4 +11,5 @@ urlpatterns = [
     path('accounts/signup/', user_views.signup, name='signup'),
 
     path('memo/', include('memo.urls')),
+    path("", lambda request: redirect("memo/")),
 ]

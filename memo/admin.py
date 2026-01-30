@@ -1,8 +1,5 @@
-﻿from django.contrib import admin
-from .models import Memo
+from django.contrib import admin
+from .models import Memo, Category
 
-@admin.register(Memo)
-class MemoAdmin(admin.ModelAdmin):
-    list_display = ['title', 'category', 'confidence', 'created_at']
-    list_filter = ['category', 'created_at']
-    search_fields = ['title', 'content', 'keywords']
+admin.site.register(Memo)
+admin.site.register(Category)

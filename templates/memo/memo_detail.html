@@ -35,23 +35,24 @@
       {{ memo.content }}
     </div>
 
-    <div style="margin-top:18px; display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
-      <a href="/memo/" style="text-decoration:none;color:#333;">← 목록</a>
+ <div style="margin-top:18px; display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+  <a href="{% url 'memo:list' %}" style="text-decoration:none; color:#333;">← 목록</a>
 
-      <a href="{% url 'memo_update' memo.id %}"
-         style="padding:8px 14px; border:1px solid #4a7; background:#fff; color:#4a7; border-radius:10px; text-decoration:none;">
-        수정
-      </a>
+  <a href="{% url 'memo:update' memo.id %}"
+     style="padding:8px 14px; border:1px solid #4a7; background:#fff; color:#4a7; border-radius:10px; text-decoration:none;">
+     수정
+  </a>
 
-      <form method="post" action="{% url 'memo_delete' memo.id %}" style="margin:0;">
-        {% csrf_token %}
-        <button type="submit"
-          onclick="return confirm('정말 삭제할까요?');"
-          style="padding:8px 14px; border:1px solid #e33; background:#fff; color:#e33; border-radius:10px; cursor:pointer;">
-          삭제
-        </button>
-      </form>
-    </div>
+  <form method="post" action="{% url 'memo:delete' memo.id %}" style="margin:0;">
+    {% csrf_token %}
+    <button type="submit"
+            onclick="return confirm('정말 삭제할까요?');"
+            style="padding:8px 14px; border:1px solid #e33; background:#fff; color:#e33; border-radius:10px; cursor:pointer;">
+      삭제
+    </button>
+  </form>
+</div>
+
 
   </div>
 </body>
