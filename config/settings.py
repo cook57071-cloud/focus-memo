@@ -38,9 +38,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'memo',
-    'users',
+    'memo',          # 기존 메모 앱 (박홍진님)
+    'users',         # 사용자 인증 앱 (민승민님)
+    'memo_app',      # 새 메모 앱 (다른 팀원) ← 추가
+    'crispy_forms',  # 폼 디자인 라이브러리 ← 추가
 ]
+    # settings.py 파일 맨 아래에 추가
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
