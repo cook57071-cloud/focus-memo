@@ -12,7 +12,7 @@ def memo_create(request):
             if request.user.is_authenticated:
                 memo.author = request.user
             memo.save()
-            return redirect('memo_list') 
+            return redirect('memo:list') 
     else:
         form = MemoForm()
     
