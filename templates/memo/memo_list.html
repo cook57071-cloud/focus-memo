@@ -1,3 +1,8 @@
+{% load text_filters %}
+<!doctype html>
+<html lang="ko">
+...
+
 <!doctype html>
 <html lang="ko">
 <head>
@@ -8,14 +13,22 @@
   <style>
     body { background:#f7f5f1; }
 
-    .memo-card{
-      background:#fff;
-      border:1px solid #ece6de;
-      border-radius:18px;
-      padding:16px 18px;
-      box-shadow:0 6px 20px rgba(0,0,0,.04);
-      margin-bottom:12px;
-    }
+    .memo-card {
+  background: #fff;
+  border: 1px solid #ece6de;
+  border-radius: 18px;
+  padding: 16px 18px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.04);
+  margin-bottom: 16px;
+
+ 
+  margin-left: auto;     /* ⭐ 가운데 정렬 */
+  margin-right: auto;
+
+  display: flex;         /* ⭐ 내부 정렬용 */
+  flex-direction: column;
+}
+
 
     .memo-top{
       display:flex;
@@ -49,12 +62,19 @@
       font-size:13px;
     }
 
-    .preview{
-      margin-top:10px;
-      color:#3e3e3e;
-      line-height:1.5;
-      white-space:pre-wrap;
-    }
+    .preview {
+  margin-top: 10px;
+  color: #3e3e3e;
+  line-height: 1.5;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;      /* ⭐ 2줄 고정 (3줄 원하면 3) */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+
+  min-height: 3em;            /* ⭐ 줄 수 안 맞아도 높이 유지 */
+}
+
 
     .detail-link{
       text-decoration:none;
@@ -63,6 +83,50 @@
       font-size:18px;
     }
     .detail-link:hover{ color:#333; }
+    .tag-row{
+  margin-top:10px;
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.tag-chip{
+  display:inline-flex;
+  align-items:center;
+  padding:6px 10px;
+  border-radius:999px;
+  background:#f1f6ef;
+  border:1px solid #d9e4d6;
+  font-size:12px;
+  font-weight:700;
+  color:#4d5a43;
+}
+..tags {
+  margin-top: 10px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+
+  min-height: 28px;   /* ⭐ 태그 없을 때도 공간 유지 */
+}
+
+.tag{
+  font-size:12px;
+  padding:4px 8px;
+  border-radius:999px;
+  background:#f1f6ef;
+  border:1px solid #d9e4d6;
+  color:#4d5a43;
+  font-weight:700;
+}
+.tags span {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #f1f6ef;
+  color: #4d5a43;
+  font-weight: 600;
+}
+
   </style>
 </head>
 <body>
@@ -121,6 +185,7 @@
       {{ c.icon }} {{ c.name }}
     </a>
   {% endfor %}
+
 </div>
 
 
@@ -130,12 +195,12 @@
          style="display:block;text-align:center;padding:14px;border-radius:12px;background:#8fa18f;color:#fff;text-decoration:none;font-weight:600;">
         + 새 메모 작성
       </a>
-    </div>
-
-    <!-- 리스트 -->
+    
+    
  <!-- 리스트 -->
 {% for memo in memos %}
   <div class="memo-card">
+
     <div class="memo-top">
       <div class="left">
         {% if memo.category %}
@@ -150,17 +215,20 @@
     <div class="preview">
       {{ memo.content|truncatechars:90 }}
     </div>
-  </div>
 
+    {% if memo.keywords %}
+      <div class="tags">
+        {% for kw in memo.keywords_list %}
+          <span class="tag">#{{ kw }}</span>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+  </div>
 {% empty %}
   <div class="memo-card">아직 메모가 없어요. + 새 메모 작성해보자!</div>
 {% endfor %}
 
 
-        </a>
-      </div>
-   
-
-  </div>
 </body>
 </html>
