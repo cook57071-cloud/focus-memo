@@ -10,22 +10,34 @@ from .models import Memo, Category
 
 @login_required
 def memo_list(request):
+    # ✅ 여기 추가 (q/sort/category 먼저 정의)
+    q = request.GET.get("q", "").strip()
+    sort = request.GET.get("sort", "latest")
+    selected_category = request.GET.get("category", "")
 
+    memos = Memo.objects.all().select_related("category")
+
+    # 검색
     if q:
         memos = memos.filter(content__icontains=q)
 
+    # 카테고리 필터 (category가 숫자 id로 넘어오는 구조일 때)
+    if selected_category:
+        memos = memos.filter(category_id=selected_category)
+
+    # 정렬
     if sort == "oldest":
         memos = memos.order_by("created_at")
     else:
         memos = memos.order_by("-created_at")
 
-    categories = Category.objects.all().order_by("order", "id")
+    categories = Category.objects.all().order_by("order")
 
     return render(request, "memo/memo_list.html", {
         "memos": memos,
-        "q": q,
         "categories": categories,
-        "selected_category": category_id,
+        "selected_category": selected_category,
+        "q": q,
         "sort": sort,
     })
 
