@@ -1,71 +1,77 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
+# memo/views.py
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models import Q
 from django.views.decorators.http import require_POST
 
-from .forms import MemoForm
-from .models import Memo, Category
+from .models import Category, Memo
 
+from .forms import MemoForm
 
 
 @login_required
 def memo_list(request):
-    # ✅ 여기 추가 (q/sort/category 먼저 정의)
     q = request.GET.get("q", "").strip()
     sort = request.GET.get("sort", "latest")
-    selected_category = request.GET.get("category", "")
+    selected_category = request.GET.get("category", "").strip()
 
-    memos = Memo.objects.all().select_related("category")
+    memos = Memo.objects.filter(author=request.user)
 
-    # 검색
     if q:
-        memos = memos.filter(content__icontains=q)
+        memos = memos.filter(Q(content__icontains=q))  # ✅ 언더바 2개
 
-    # 카테고리 필터 (category가 숫자 id로 넘어오는 구조일 때)
-    if selected_category:
-        memos = memos.filter(category_id=selected_category)
+    if selected_category and selected_category.isdigit():
+        memos = memos.filter(category_id=int(selected_category))
 
-    # 정렬
     if sort == "oldest":
         memos = memos.order_by("created_at")
     else:
         memos = memos.order_by("-created_at")
 
-    categories = Category.objects.all().order_by("order")
+    categories = Category.objects.order_by("order")
 
-    return render(request, "memo/memo_list.html", {
+    context = {
         "memos": memos,
         "categories": categories,
         "selected_category": selected_category,
         "q": q,
         "sort": sort,
-    })
+    }
+    return render(request, "memo/memo_list.html", context)
+
 
 
 
 @login_required
 def memo_detail(request, memo_id):
-    memo = get_object_or_404(Memo, id=memo_id, user=request.user)
-    return render(request, 'memo/memo_detail.html', {'memo': memo})
+    memo = get_object_or_404(Memo, id=memo_id, author=request.user)
+    return render(request, "memo/memo_detail.html", {"memo": memo})
 
 
 
 
 @login_required
 def memo_create(request):
-    if request.method == 'POST':
-        # 1. 폼 데이터 가져오기
+    if request.method == "POST":
         form = MemoForm(request.POST)
-        
-        # 2. 폼 검증 (여기서 False가 나면 저장이 안 됨)
         if form.is_valid():
             memo = form.save(commit=False)
-            
-            # [수정 포인트] author가 아니라 user 필드에 저장해야 함!
-            memo.user = request.user 
-            
+            memo.author = request.user
             memo.save()
-            messages.success(request, '메모가 저장되었습니다!')
+            return redirect("memo:list")
+    else:
+        form = MemoForm()
+
+    categories = Category.objects.all().order_by("order")
+
+    return render(
+        request,
+        "memo/memo_create.html",
+        {
+            "form": form,
+            "categories": categories,
+        },
+    )
 
 @login_required
 def memo_update(request, memo_id):
